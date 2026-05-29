@@ -1,14 +1,29 @@
 #!/bin/bash
 
+# Clean up old local_manifests
 rm -rf .repo/local_manifests
 
-repo init --no-repo-verify --git-lfs -u https://github.com/ProjectInfinity-X/manifest -b 16 -g default,-mips,-darwin,-notdefault
+# Clean the build environment
+make clobber
 
-git clone https://github.com/mdnoyon80123/hotdogb_local_manifest --depth 1 -b inf-q2 .repo/local_manifests
+# Initialize the repo
+repo init -u https://github.com/PixelOS-AOSP/android_manifest.git -b sixteen-qpr2 --git-lfs
 
+# Clone your local_manifest repository
+git clone https://github.com/mdnoyon80123/hotdogb_local_manifest-j --depth 1 -b main .repo/local_manifests
+
+# Sync the source code
 /opt/crave/resync.sh
 
-source build/envsetup.sh
-lunch infinity_hotdogb-userdebug
+# Set environment variables for KernelSU
+export WITH_KSU=true
+export KSU_SUPPORT=1
 
-m bacon
+# Setup build environment
+source build/envsetup.sh
+
+# Configure for your device with userdebug
+breakfast hotdogb userdebug
+
+# Start the compilation
+m pixelos
